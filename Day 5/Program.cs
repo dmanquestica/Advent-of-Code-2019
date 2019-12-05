@@ -1,9 +1,6 @@
 ﻿using Shared_Utilities;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Day_5
 {
@@ -41,18 +38,16 @@ namespace Day_5
 
 		public void Run()
 		{
-			while (ControlModule())
+			while (Machine())
 			{
 			}
 		}
 
-		private bool ControlModule()
+		private bool Machine()
 		{
 			var opcode = mem.GetData(pointer).ToString();
-			//Pad opcode to 5 digits
 			opcode = opcode.PadLeft(5,'0');
 
-			//Pick actual instruction from the opcode
 			int instruction = int.Parse(opcode.Substring(3));
 
 			if (instruction == 3)
@@ -133,15 +128,15 @@ namespace Day_5
 			return true;
 		}
 
-		private void Addition(int parC, int parB, int parA)
+		private void Addition(int parameter3, int parameter2, int parameter1)
 		{
-			mem.SetData(parA, parC + parB);
+			mem.SetData(parameter1, parameter3 + parameter2);
 			pointer += 4;
 		}
 
-		private void Multiplication(int parC, int parB, int parA)
+		private void Multiplication(int parameter3, int parameter2, int parameter1)
 		{
-			mem.SetData(parA, parC * parB);
+			mem.SetData(parameter1, parameter3 * parameter2);
 			pointer += 4;
 		}
 
@@ -158,11 +153,11 @@ namespace Day_5
 			pointer += 2;
 		}
 
-		private void JumpIfTrue(int parC, int parB)
+		private void JumpIfTrue(int parameter3, int parameter2)
 		{
-			if (parC != 0)
+			if (parameter3 != 0)
 			{
-				pointer = parB;
+				pointer = parameter2;
 			}
 			else
 			{
@@ -170,11 +165,11 @@ namespace Day_5
 			}
 		}
 
-		private void JumpIfNotTrue(int parC, int parB)
+		private void JumpIfNotTrue(int parameter3, int parameter2)
 		{
-			if (parC == 0)
+			if (parameter3 == 0)
 			{
-				pointer = parB;
+				pointer = parameter2;
 			}
 			else
 			{
@@ -183,28 +178,28 @@ namespace Day_5
 
 		}
 
-		private void LessThan(int parC, int parB, int parA)
+		private void LessThan(int parameter3, int parameter2, int parameter1)
 		{
-			if (parC < parB)
+			if (parameter3 < parameter2)
 			{
-				mem.SetData(parA, 1);
+				mem.SetData(parameter1, 1);
 			}
 			else
 			{
-				mem.SetData(parA, 0);
+				mem.SetData(parameter1, 0);
 			}
 			pointer += 4;
 		}
 
-		private void Equals(int parC, int parB, int parA)
+		private void Equals(int parameter3, int parameter2, int parameter1)
 		{
-			if (parC == parB)
+			if (parameter3 == parameter2)
 			{
-				mem.SetData(parA, 1);
+				mem.SetData(parameter1, 1);
 			}
 			else
 			{
-				mem.SetData(parA, 0);
+				mem.SetData(parameter1, 0);
 			}
 			pointer += 4;
 		}
