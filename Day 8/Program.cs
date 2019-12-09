@@ -32,17 +32,17 @@ namespace Day_8
 
 	class Program
 	{
+		static readonly int WIDTH = 25;
+		static readonly int HEIGHT = 6;
+
 		static void Main(string[] args)
 		{
 			var input = Utilities.ReadFileAsString(args[0]);
 
 			var layers = new List<Layer>();
 
-			for (int i = 0; i < input.Length; i += (25 * 6))
-			{
-				var layer = new Layer(input.Substring(i, 25 * 6));
-				layers.Add(layer);
-			}
+			for (int i = 0; i < input.Length; i += (WIDTH * HEIGHT))
+				layers.Add(new Layer(input.Substring(i, WIDTH * HEIGHT)));
 
 			Part1(layers);
 			Part2(layers);
@@ -63,14 +63,14 @@ namespace Day_8
 
 		public static void Part2(List<Layer> layers)
 		{
-			var image = new int[25 * 6];
+			var image = new int[WIDTH * HEIGHT];
 
-			for (int i = 0; i < 25 * 6; ++i)
+			for (int i = 0; i < WIDTH * HEIGHT; ++i)
 				image[i] = 2;
 
 			foreach (var l in layers)
 			{
-				for (int i = 0; i < 25 * 6; ++i)
+				for (int i = 0; i < WIDTH * HEIGHT; ++i)
 				{
 					if (l.Data[i] == 0 && image[i] == 2)
 						image[i] = 0;
@@ -84,12 +84,12 @@ namespace Day_8
 
 		public static void PrintMessage(int[] image)
 		{
-			for (int j = 0; j < 6; ++j)
+			for (int j = 0; j < HEIGHT; ++j)
 			{
-				for (int i = 0; i < 25; ++i)
+				for (int i = 0; i < WIDTH; ++i)
 				{
-					if (image[j * 25 + i] == 1)
-						Console.Write("1");
+					if (image[j * WIDTH + i] == 1)
+						Console.Write("@");
 					else
 						Console.Write(" ");
 				}
