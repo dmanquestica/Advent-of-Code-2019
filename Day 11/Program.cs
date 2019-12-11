@@ -2,12 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 
 namespace Day_11
 {
 	using Coords = Tuple<int, int>;
-	using INT = Int64;
 	public enum ParameterMode
 	{
 		Positional = 0,
@@ -17,34 +15,34 @@ namespace Day_11
 
 	class Intcode
 	{
-		private readonly Queue<INT> InputQueue = new Queue<INT>();
+		private readonly Queue<Int64> InputQueue = new Queue<Int64>();
 
-		public INT OutputValue = 0;
+		public Int64 OutputValue = 0;
 		public Intcode OutputMachine = null;
 
 		private long[] Memory { get; set; }
-		private INT InstructionPointer = 0;
-		private INT RelativeBase = 0;
+		private Int64 InstructionPointer = 0;
+		private Int64 RelativeBase = 0;
 
 		public bool Waiting = false;
 		public bool Halted = false;
 		public bool SentOutput = false;
 
-		INT OpCode;
+		Int64 OpCode;
 
-		public Intcode(INT[] initialMemory)
+		public Intcode(Int64[] initialMemory)
 		{
 			Memory = new long[initialMemory.Count() + 10000];
 			initialMemory.CopyTo(Memory, 0);
 		}
 
-		public void SendInput(INT input)
+		public void SendInput(Int64 input)
 		{
 			InputQueue.Enqueue(input);
 			Waiting = false;
 		}
 
-		private void Output(INT i)
+		private void Output(Int64 i)
 		{
 			OutputValue = i;
 			if (OutputMachine != null)
@@ -54,12 +52,12 @@ namespace Day_11
 			SentOutput = true;
 		}
 
-		private INT GetMem(INT address)
+		private Int64 GetMem(Int64 address)
 		{
 			return Memory[address];
 		}
 
-		private void SetMem(INT address, INT value)
+		private void SetMem(Int64 address, Int64 value)
 		{
 			Memory[address] = value;
 		}
@@ -72,9 +70,9 @@ namespace Day_11
 			return (ParameterMode)(mode % 10);
 		}
 
-		private void SetParam(int idx, INT value)
+		private void SetParam(int idx, Int64 value)
 		{
-			INT param = GetMem(InstructionPointer + idx);
+			Int64 param = GetMem(InstructionPointer + idx);
 			switch (AccessMode(idx))
 			{
 				case ParameterMode.Positional: // position mode
@@ -90,9 +88,9 @@ namespace Day_11
 			}
 		}
 
-		private INT GetParam(int idx)
+		private Int64 GetParam(int idx)
 		{
-			INT param = GetMem(InstructionPointer + idx);
+			Int64 param = GetMem(InstructionPointer + idx);
 			switch (AccessMode(idx))
 			{
 				case ParameterMode.Positional:
@@ -104,10 +102,9 @@ namespace Day_11
 				default:
 					throw new Exception("Invalid Intcode parameter mode");
 			}
-
 		}
 
-		private void ParseOpCode(INT opCode)
+		private void ParseOpCode(Int64 opCode)
 		{
 			OpCode = (opCode % 100);
 		}
@@ -203,18 +200,18 @@ namespace Day_11
 		public void LessThan()
 		{
 			if (GetParam(1) < GetParam(2))
-				SetParam(3, (INT)1);
+				SetParam(3, (Int64)1);
 			else
-				SetParam(3, (INT)0);
+				SetParam(3, (Int64)0);
 			InstructionPointer += 4;
 		}
 
 		public void IsEquals()
 		{
 			if (GetParam(1) == GetParam(2))
-				SetParam(3, (INT)1);
+				SetParam(3, (Int64)1);
 			else
-				SetParam(3, (INT)0);
+				SetParam(3, (Int64)0);
 			InstructionPointer += 4;
 		}
 
@@ -243,14 +240,14 @@ namespace Day_11
 
 	}
 
-	class Paintbot
+	class HullPainter
 	{
 		public Dictionary<Coords, int> HullGrid;
 		public Intcode Brain;
 		public Coords Cursor;
 		public int facing = 0;
 
-		public Paintbot(INT[] input)
+		public HullPainter(Int64[] input)
 		{
 			HullGrid = new Dictionary<Coords, int>();
 			Brain = new Intcode(input);
@@ -337,10 +334,10 @@ namespace Day_11
 			int maxy = 0;
 			foreach (var coords in HullGrid.Keys)
 			{
-				if (coords.Item1 < minx) minx = coords.Item1;
-				if (coords.Item1 > maxx) maxx = coords.Item1;
-				if (coords.Item2 < miny) miny = coords.Item2;
-				if (coords.Item2 > maxy) maxy = coords.Item2;
+				minx = Math.Min(coords.Item1, minx);
+				maxx = Math.Max(coords.Item1, maxx);
+				miny = Math.Min(coords.Item2, miny);
+				maxy = Math.Max(coords.Item2, maxy);
 			}
 
 			for (int y = maxy; y >= miny; y--)
@@ -358,12 +355,14 @@ namespace Day_11
 	{
 		public static void Main(string[] args)
 		{
-			var input = Utilities.ReadFileAsString(args[0]).Split(',').Select(INT.Parse).ToArray();
-			Paintbot p = new Paintbot(input);
+			var input = Utilities.ReadFileAsString(args[0]).Split(',').Select(Int64.Parse).ToArray();
+			// Part 1
+			HullPainter p = new HullPainter(input);
 			p.Run();
 			Console.WriteLine($"Part 1: {p.CountPainted()}");
 
-			p = new Paintbot(input);
+			// Part 2
+			p = new HullPainter(input);
 			p.SetColor(1);
 			p.Run();
 			Console.WriteLine("Part 2:");
