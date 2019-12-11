@@ -1,9 +1,5 @@
 ﻿using Shared_Utilities;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Day_1
 {
@@ -26,7 +22,6 @@ namespace Day_1
 			// Part 2
 
 			sum = 0;
-			int i = 0;
 
 			foreach (var mass in input)
 			{
