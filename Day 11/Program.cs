@@ -15,7 +15,6 @@ namespace Day_11
 		Relative = 2
 	}
 
-
 	class Intcode
 	{
 		private readonly Queue<INT> InputQueue = new Queue<INT>();
@@ -65,12 +64,12 @@ namespace Day_11
 			Memory[address] = value;
 		}
 
-		private int AccessMode(int idx)
+		private ParameterMode AccessMode(int idx)
 		{
 			int mode = (int)GetMem(InstructionPointer) / 100;
 			for (int i = 1; i < idx; i++)
 				mode /= 10;
-			return mode % 10;
+			return (ParameterMode)(mode % 10);
 		}
 
 		private void SetParam(int idx, INT value)
@@ -78,12 +77,12 @@ namespace Day_11
 			INT param = GetMem(InstructionPointer + idx);
 			switch (AccessMode(idx))
 			{
-				case 0: // position mode
+				case ParameterMode.Positional: // position mode
 					SetMem(param, value);
 					break;
-				case 1: // immediate mode -- should never occur
+				case ParameterMode.Immediate: // immediate mode -- should never occur
 					throw new Exception("Intcode immediate mode not allowed in setting memory");
-				case 2: // relative mode
+				case ParameterMode.Relative: // relative mode
 					SetMem(RelativeBase + param, value);
 					break;
 				default:
@@ -96,11 +95,11 @@ namespace Day_11
 			INT param = GetMem(InstructionPointer + idx);
 			switch (AccessMode(idx))
 			{
-				case 0: // position mode
+				case ParameterMode.Positional:
 					return GetMem(param);
-				case 1: // immediate mode
+				case ParameterMode.Immediate: // immediate mode
 					return param;
-				case 2: // relative mode
+				case ParameterMode.Relative: // relative mode
 					return GetMem(RelativeBase + param);
 				default:
 					throw new Exception("Invalid Intcode parameter mode");
