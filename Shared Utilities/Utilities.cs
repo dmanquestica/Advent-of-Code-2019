@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Shared_Utilities
 {
@@ -30,6 +30,17 @@ namespace Shared_Utilities
 			{
 				using (var sr = new StreamReader(fs))
 					return sr.ReadToEnd();
+			}
+		}
+		public static T DeepClone<T>(this T obj)
+		{
+			using (var ms = new MemoryStream())
+			{
+				var formatter = new BinaryFormatter();
+				formatter.Serialize(ms, obj);
+				ms.Position = 0;
+
+				return (T)formatter.Deserialize(ms);
 			}
 		}
 	}
