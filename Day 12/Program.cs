@@ -7,37 +7,37 @@ using System.Text.RegularExpressions;
 namespace Day_12
 {
 	[Serializable]
-	class Moon
+	class 月
 	{
-		public int InitialX;
-		public int InitialY;
-		public int InitialZ;
+		public int InitialX; // For debugging
+		public int InitialY; // For debugging
+		public int InitialZ; // For debugging
 		public int X;
 		public int Y;
 		public int Z;
-		public (int x, int y, int z) Velocity;
-		public List<Moon> Siblings;
+		public (int X, int Y, int Z) Velocity;
+		public List<月> 姐妹;
 
-		public Moon(int x, int y, int z)
+		public 月(int x, int y, int z)
 		{
-			InitialX = x;
-			InitialY = y;
-			InitialZ = z;
+			InitialX = x; // For debugging
+			InitialY = y; // For debugging
+			InitialZ = z; // For debugging
 			X = x;
 			Y = y;
 			Z = z;
 			Velocity = (0, 0, 0);
-			Siblings = new List<Moon>();
+			姐妹 = new List<月>();
 		}
 
-		public (int x, int y, int z) GravityTo(Moon m)
+		public (int X, int Y, int Z) GravityTo(月 m)
 		{
 			return (GravityTo(m, 0),
 					GravityTo(m, 1),
 					GravityTo(m, 2));
 		}
 
-		public int GravityTo(Moon m, int axis)
+		public int GravityTo(月 m, int axis)
 		{
 			int result = 0;
 			switch (axis)
@@ -60,13 +60,13 @@ namespace Day_12
 			switch (axis)
 			{
 				case 0:
-					X += Velocity.x;
+					X += Velocity.X;
 					break;
 				case 1:
-					Y += Velocity.y;
+					Y += Velocity.Y;
 					break;
 				case 2:
-					Z += Velocity.z;
+					Z += Velocity.Z;
 					break;
 			}
 		}
@@ -78,7 +78,7 @@ namespace Day_12
 
 		public int KineticEnergy()
 		{
-			return Math.Abs(Velocity.x) + Math.Abs(Velocity.y) + Math.Abs(Velocity.z);
+			return Math.Abs(Velocity.X) + Math.Abs(Velocity.Y) + Math.Abs(Velocity.Z);
 		}
 	}
 
@@ -96,7 +96,7 @@ namespace Day_12
 			for (int i = 0; i < steps; ++i)
 			{
 				CalculateVelocity(moons);
-				AdjustPositions(moons);
+				Step(moons);
 			}
 			Console.WriteLine($"Part 1: {moons.Sum(m => m.KineticEnergy() * m.PotentialEnergy())}");
 
@@ -108,14 +108,14 @@ namespace Day_12
 			while (true)
 			{
 				var curXState = (moons[0].X,		  moons[1].X,		   moons[2].X,			moons[3].X,             // Position
-								 moons[0].Velocity.x, moons[1].Velocity.x, moons[2].Velocity.x, moons[3].Velocity.x);	// Velocity
+								 moons[0].Velocity.X, moons[1].Velocity.X, moons[2].Velocity.X, moons[3].Velocity.X);	// Velocity
 				if (states.Contains(curXState))
 					break;
 				else
 				{
 					states.Add(curXState);
 					CalculateVelocity(moons, 0);
-					AdjustPositions(moons, 0);
+					Step(moons, 0);
 					xSteps++;
 				}
 			}
@@ -126,14 +126,14 @@ namespace Day_12
 			while (true)
 			{
 				var curYState = (moons[0].Y,		  moons[1].Y,		   moons[2].Y,			moons[3].Y,             // Position
-								 moons[0].Velocity.y, moons[1].Velocity.y, moons[2].Velocity.y, moons[3].Velocity.y);	// Velocity
+								 moons[0].Velocity.Y, moons[1].Velocity.Y, moons[2].Velocity.Y, moons[3].Velocity.Y);	// Velocity
 				if (states.Contains(curYState))
 					break;
 				else
 				{
 					states.Add(curYState);
 					CalculateVelocity(moons, 1);
-					AdjustPositions(moons, 1);
+					Step(moons, 1);
 					ySteps++;
 				}
 			}
@@ -144,50 +144,50 @@ namespace Day_12
 			while (true)
 			{
 				var curZState = (moons[0].Z,          moons[1].Z,          moons[2].Z,          moons[3].Z,				// Position
-								 moons[0].Velocity.z, moons[1].Velocity.z, moons[2].Velocity.z, moons[3].Velocity.z);   // Velocity
+								 moons[0].Velocity.Z, moons[1].Velocity.Z, moons[2].Velocity.Z, moons[3].Velocity.Z);   // Velocity
 				if (states.Contains(curZState))
 					break;
 				else
 				{
 					states.Add(curZState);
 					CalculateVelocity(moons, 2);
-					AdjustPositions(moons, 2);
+					Step(moons, 2);
 					zSteps++;
 				}
 			}
 
-			Console.WriteLine($"Part 2: {LowestCommonFactor(xSteps, LowestCommonFactor(ySteps, zSteps))}");
+			Console.WriteLine($"Part 2: {LowestCommonMultiple(xSteps, LowestCommonMultiple(ySteps, zSteps))}");
 
 			Console.ReadKey();
 		}
 
-		static List<Moon> Reset(IList<string> input)
+		static List<月> Reset(IList<string> input)
 		{
 			var pattern = @"\<x=(-?[\d]{1,}), y=(-?[\d]{1,}), z=(-?[\d]{1,})\>";
 
-			var moons = new List<Moon>();
+			var moons = new List<月>();
 			foreach (var s in input)
 			{
 				var match = Regex.Match(s, pattern);
-				moons.Add(new Moon(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value), int.Parse(match.Groups[3].Value)));
+				moons.Add(new 月(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value), int.Parse(match.Groups[3].Value)));
 			}
 
 			foreach (var m in moons)
 			{
-				m.Siblings.AddRange(moons.Where(n => n != m));
+				m.姐妹.AddRange(moons.Where(n => n != m));
 			}
 
 			return moons;
 		}
 
-		static void AdjustPositions(List<Moon> moons)
+		static void Step(List<月> moons)
 		{
-			AdjustPositions(moons, 0);
-			AdjustPositions(moons, 1);
-			AdjustPositions(moons, 2);
+			Step(moons, 0);
+			Step(moons, 1);
+			Step(moons, 2);
 		}
 
-		static void AdjustPositions(List<Moon> moons, int axis)
+		static void Step(List<月> moons, int axis)
 		{
 			foreach (var m in moons)
 			{
@@ -195,31 +195,31 @@ namespace Day_12
 			}
 		}
 
-		static void CalculateVelocity(List<Moon> moons)
+		static void CalculateVelocity(List<月> moons)
 		{
 			CalculateVelocity(moons, 0);
 			CalculateVelocity(moons, 1);
 			CalculateVelocity(moons, 2);
 		}
 
-		static void CalculateVelocity(List<Moon> moons, int axis)
+		static void CalculateVelocity(List<月> moons, int axis)
 		{
 			foreach (var m in moons)
 			{
-				var Xvelocity = m.Velocity.x;
-				var Yvelocity = m.Velocity.y;
-				var Zvelocity = m.Velocity.z;
+				var Xvelocity = m.Velocity.X;
+				var Yvelocity = m.Velocity.Y;
+				var Zvelocity = m.Velocity.Z;
 
 				switch (axis)
 				{
 					case 0:
-						Xvelocity += m.Siblings.Sum(n => m.GravityTo(n).x);
+						Xvelocity += m.姐妹.Sum(n => m.GravityTo(n).X);
 						break;
 					case 1:
-						Yvelocity += m.Siblings.Sum(n => m.GravityTo(n).y);
+						Yvelocity += m.姐妹.Sum(n => m.GravityTo(n).Y);
 						break;
 					case 2:
-						Zvelocity += m.Siblings.Sum(n => m.GravityTo(n).z);
+						Zvelocity += m.姐妹.Sum(n => m.GravityTo(n).Z);
 						break;
 
 				}
@@ -227,7 +227,7 @@ namespace Day_12
 			}
 		}
 
-		static long LowestCommonFactor(long a, long b)
+		static long LowestCommonMultiple(long a, long b)
 		{
 			return (a * b) / GreatestCommonDenominator(a, b);
 		}
