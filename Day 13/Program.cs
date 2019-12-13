@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Day_11
+namespace Day_13
 {
-	using Coords = Tuple<int, int>;
+	using Coords = Tuple<Int64, Int64>;
 	public enum ParameterMode
 	{
 		Positional = 0,
@@ -16,8 +18,8 @@ namespace Day_11
 	class Intcode
 	{
 		private readonly Queue<Int64> InputQueue = new Queue<Int64>();
+		private readonly Queue<Int64> OutputQueue = new Queue<Int64>();
 
-		public Int64 OutputValue = 0;
 		public Intcode OutputMachine = null;
 
 		private Int64[] Memory { get; set; }
@@ -42,12 +44,22 @@ namespace Day_11
 			Waiting = false;
 		}
 
+		public Queue<Int64> GetOutputQueue()
+		{
+			return OutputQueue;
+		}
+
+		public Int64 GetOutput()
+		{
+			return OutputQueue.Dequeue();
+		}
+
 		private void Output(Int64 i)
 		{
-			OutputValue = i;
+			OutputQueue.Enqueue(i);
 			if (OutputMachine != null)
 			{
-				OutputMachine.SendInput(i);
+				OutputMachine.SendInput(OutputQueue.Dequeue());
 			}
 			SentOutput = true;
 		}
@@ -237,102 +249,90 @@ namespace Day_11
 			{
 			}
 		}
-
 	}
 
-	class HullPainter
+	class Arcade
 	{
-		public Dictionary<Coords, int> HullGrid;
+		public Dictionary<Coords, Int64> PlayGrid;
 		public Intcode Brain;
-		public Coords Cursor;
+		Coords paddleCoords;
+		Coords ballCoords;
+		public Int64 Score;
 		public int facing = 0;
 
-		public HullPainter(Int64[] input)
+		public Arcade(Int64[] input)
 		{
-			HullGrid = new Dictionary<Coords, int>();
+			PlayGrid = new Dictionary<Coords, Int64>();
 			Brain = new Intcode(input);
-			Cursor = new Coords(0, 0);
 		}
 
-		public int GetColor(Coords coords)
+		private Int64 GetTile(Coords coords)
 		{
-			return HullGrid.ContainsKey(coords) ? HullGrid[coords] : 0;
+			return PlayGrid.ContainsKey(coords) ? PlayGrid[coords] : 0;
 		}
 
-		public int GetColor()
+		public void ProcessOutputs()
 		{
-			return GetColor(Cursor);
-		}
-
-		public void SetColor(int color)
-		{
-			HullGrid[Cursor] = color;
-		}
-
-		public void TurnLeft()
-		{
-			facing = (facing + 3) % 4;
-		}
-
-		public void TurnRight()
-		{
-			facing = (facing + 1) % 4;
-		}
-
-		public void StepForward()
-		{
-			switch (facing)
+			while (Brain.GetOutputQueue().Count > 0)
 			{
-				case 0:
-					Cursor = new Coords(Cursor.Item1, Cursor.Item2 + 1);
-					break;
-				case 1:
-					Cursor = new Coords(Cursor.Item1 + 1, Cursor.Item2);
-					break;
-				case 2:
-					Cursor = new Coords(Cursor.Item1, Cursor.Item2 - 1);
-					break;
-				case 3:
-					Cursor = new Coords(Cursor.Item1 - 1, Cursor.Item2);
-					break;
-			}
-		}
+				var x = Brain.GetOutput();
+				var y = Brain.GetOutput();
+				var tile = Brain.GetOutput();
 
-		public void Run()
-		{
-			Brain.RunToOutput();
-			while (!Brain.Halted)
-			{
-				if (Brain.Waiting)
-				{
-					Brain.SendInput(GetColor());
-				}
+				if (x == -1 && y == 0)
+					Score = tile;
+
+				var p = new Coords(x, y);
+
+				if (!PlayGrid.ContainsKey(p))
+					PlayGrid.Add(p, tile);
 				else
-				{
-					SetColor((int)Brain.OutputValue);
-					Brain.RunToOutput();
-					if (Brain.OutputValue == 0)
-						TurnLeft();
-					else
-						TurnRight();
-					StepForward();
-				}
-				Brain.RunToOutput();
+					PlayGrid[p] = tile;
+
+				if (tile == 3)
+					paddleCoords = p;
+				else if (tile == 4)
+					ballCoords = p;
 			}
 		}
 
-		public int CountPainted()
+		public void SetupPlayArea()
 		{
-			return HullGrid.Count;
+			Brain.Run();
+			ProcessOutputs();
+		}
+
+		public void PlayGame()
+		{
+			Brain.Run();
+			while (Brain.Waiting)
+			{
+				ProcessOutputs();
+
+				Brain.SendInput(MoveJoystick());
+
+				Brain.Run();
+			}
+			ProcessOutputs();
+		}
+
+		private Int64 MoveJoystick()
+		{
+			return ballCoords.Item1.CompareTo(paddleCoords.Item1);
+		}
+
+		public int CountTiles(Int64 type)
+		{
+			return PlayGrid.Where(t => t.Value == type).Count();
 		}
 
 		public void Display()
 		{
-			int minx = 0;
-			int maxx = 0;
-			int miny = 0;
-			int maxy = 0;
-			foreach (var coords in HullGrid.Keys)
+			Int64 minx = 0;
+			Int64 maxx = 0;
+			Int64 miny = 0;
+			Int64 maxy = 0;
+			foreach (var coords in PlayGrid.Keys)
 			{
 				minx = Math.Min(coords.Item1, minx);
 				maxx = Math.Max(coords.Item1, maxx);
@@ -340,11 +340,29 @@ namespace Day_11
 				maxy = Math.Max(coords.Item2, maxy);
 			}
 
-			for (int y = maxy; y >= miny; y--)
+			for (Int64 y = miny; y <= maxy; y++)
 			{
-				for (int x = minx; x <= maxx; x++)
+				for (Int64 x = minx; x <= maxx; x++)
 				{
-					Console.Write(GetColor(new Coords(x, y)) > 0 ? '#' : ' ');
+					var currentTile = GetTile(new Coords(x, y));
+					switch (currentTile)
+					{
+						case 0:
+							Console.Write(' ');
+							break;
+						case 1:
+							Console.Write('|');
+							break;
+						case 2:
+							Console.Write('#');
+							break;
+						case 3:
+							Console.Write('=');
+							break;
+						case 4:
+							Console.Write('.');
+							break;
+					}
 				}
 				Console.WriteLine();
 			}
@@ -353,24 +371,22 @@ namespace Day_11
 
 	class Program
 	{
-		public static void Main(string[] args)
+		static void Main(string[] args)
 		{
 			var input = Utilities.ReadFileAsString(args[0]).Split(',').Select(Int64.Parse).ToArray();
 			// Part 1
-			var p = new HullPainter(input);
-			p.Run();
-			Console.WriteLine($"Part 1: {p.CountPainted()}");
+			var a = new Arcade(input);
+			a.SetupPlayArea();
+			Console.WriteLine($"Part 1: {a.CountTiles(2)}");
 
 			// Part 2
-			p = new HullPainter(input);
-			p.SetColor(1);
-			p.Run();
-			Console.WriteLine("Part 2:");
-			p.Display();
+			var b = new Arcade(input);
+			input[0] = 2;
+			b = new Arcade(input);
+			b.PlayGame();
+			Console.WriteLine($"Part 2: {b.Score}");
+
 			Console.ReadKey();
 		}
-
 	}
 }
-
-
