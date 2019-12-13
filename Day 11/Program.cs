@@ -20,7 +20,7 @@ namespace Day_11
 		public Int64 OutputValue = 0;
 		public Intcode OutputMachine = null;
 
-		private long[] Memory { get; set; }
+		private Int64[] Memory { get; set; }
 		private Int64 InstructionPointer = 0;
 		private Int64 RelativeBase = 0;
 
@@ -32,7 +32,7 @@ namespace Day_11
 
 		public Intcode(Int64[] initialMemory)
 		{
-			Memory = new long[initialMemory.Count() + 10000];
+			Memory = new Int64[initialMemory.Count() + 10000];
 			initialMemory.CopyTo(Memory, 0);
 		}
 
