@@ -325,48 +325,6 @@ namespace Day_13
 		{
 			return PlayGrid.Where(t => t.Value == type).Count();
 		}
-
-		public void Display()
-		{
-			Int64 minx = 0;
-			Int64 maxx = 0;
-			Int64 miny = 0;
-			Int64 maxy = 0;
-			foreach (var coords in PlayGrid.Keys)
-			{
-				minx = Math.Min(coords.Item1, minx);
-				maxx = Math.Max(coords.Item1, maxx);
-				miny = Math.Min(coords.Item2, miny);
-				maxy = Math.Max(coords.Item2, maxy);
-			}
-
-			for (Int64 y = miny; y <= maxy; y++)
-			{
-				for (Int64 x = minx; x <= maxx; x++)
-				{
-					var currentTile = GetTile(new Coords(x, y));
-					switch (currentTile)
-					{
-						case 0:
-							Console.Write(' ');
-							break;
-						case 1:
-							Console.Write('|');
-							break;
-						case 2:
-							Console.Write('#');
-							break;
-						case 3:
-							Console.Write('=');
-							break;
-						case 4:
-							Console.Write('.');
-							break;
-					}
-				}
-				Console.WriteLine();
-			}
-		}
 	}
 
 	class Program
