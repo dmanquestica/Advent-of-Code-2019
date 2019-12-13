@@ -33,7 +33,7 @@ namespace Day_9
 
 		public Intcode(Int64[] initialMemory)
 		{
-			Memory = new long[initialMemory.Count() + 10000];
+			Memory = new Int64[initialMemory.Count() + 10000];
 			initialMemory.CopyTo(Memory, 0);
 		}
 
@@ -246,14 +246,14 @@ namespace Day_9
 	{
 		static void Main(string[] args)
 		{
-			var input = Utilities.ReadFileAsString(args[0]).Split(',').Select(long.Parse).ToArray();
+			var input = Utilities.ReadFileAsString(args[0]).Split(',').Select(Int64.Parse).ToArray();
 			Part1(input);
 			Part2(input);
 
 			Console.ReadKey();
 		}
 
-		public static void Part1(long[] input)
+		public static void Part1(Int64[] input)
 		{
 			var computer = new Intcode(input);
 			computer.SendInput(1);
@@ -262,7 +262,7 @@ namespace Day_9
 			Console.WriteLine(computer.OutputValue);
 		}
 
-		public static void Part2(long[] input)
+		public static void Part2(Int64[] input)
 		{
 			var computer = new Intcode(input);
 			computer.SendInput(2);
