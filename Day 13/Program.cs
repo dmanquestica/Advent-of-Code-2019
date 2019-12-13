@@ -266,11 +266,6 @@ namespace Day_13
 			Brain = new Intcode(input);
 		}
 
-		private Int64 GetTile(Coords coords)
-		{
-			return PlayGrid.ContainsKey(coords) ? PlayGrid[coords] : 0;
-		}
-
 		public void ProcessOutputs()
 		{
 			while (Brain.GetOutputQueue().Count > 0)
