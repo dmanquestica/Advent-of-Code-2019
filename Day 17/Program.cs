@@ -525,8 +525,10 @@ namespace Day_17
 			{
 				if (l == 10)
 					Console.WriteLine();
-				else
+				else if (l < 256)
 					Console.Write((char)l);
+				else
+					Console.WriteLine(l);
 			}
 		}
 	}
