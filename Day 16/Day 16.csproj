@@ -54,5 +54,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shared Utilities\Shared Utilities.csproj">
+      <Project>{3D336767-2798-44D9-84C4-3D76F8408791}</Project>
+      <Name>Shared Utilities</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
