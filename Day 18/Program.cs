@@ -44,7 +44,7 @@ namespace Day_18
                 dictionary[PositionOf(k, map)] = ReachableKeys(map, PositionOf(k, map));
 
             var minimumSteps = GetKeys(map, dictionary, GetPositions(map, keys), new[] { '@' });
-            Console.WriteLine(minimumSteps);
+            Console.WriteLine($"Part 1: {minimumSteps}");
 
         }
         public void Part2()
@@ -63,8 +63,7 @@ namespace Day_18
                 dictionary[PositionOf(k, lines)] = ReachableKeys(lines, PositionOf(k, lines));
 
             var minimumSteps = GetKeys(lines, dictionary, GetPositions(lines, keys), new[] { '1', '2', '3', '4' });
-            Console.WriteLine(minimumSteps);
-
+            Console.WriteLine($"Part 2: {minimumSteps}");
         }
 
         private Dictionary<char, Coords> GetPositions(string[] map, List<char> keys)
@@ -93,6 +92,8 @@ namespace Day_18
             q.Enqueue(new RobotState { Positions = startingSet, OwnedKeys = 0 });
 
             var visited = new Dictionary<(CoordsSet, int), int>();
+
+            // Comparing keys bitwise to save time
             var finishValue = 0;
             for (var i = 0; i < positions.Count; ++i)
                 finishValue |= (int)Math.Pow(2, i);
@@ -201,7 +202,7 @@ namespace Day_18
                 {
                     list.Add(new ReachableKey { Distance = dist, Key = c, Obstacles = obst });
 
-                    foreach (var p in pos.Around())
+                    foreach (var p in pos.Steps())
                     {
                         nodes.Enqueue(p);
                         distances.Enqueue(dist + 1);
@@ -210,7 +211,7 @@ namespace Day_18
                 }
                 else if (char.IsUpper(c))
                 {
-                    foreach (var p in pos.Around())
+                    foreach (var p in pos.Steps())
                     {
                         nodes.Enqueue(p);
                         distances.Enqueue(dist + 1);
@@ -219,7 +220,7 @@ namespace Day_18
                 }
                 else if (c == '.')
                 {
-                    foreach (var p in pos.Around())
+                    foreach (var p in pos.Steps())
                     {
                         nodes.Enqueue(p);
                         distances.Enqueue(dist + 1);
@@ -342,10 +343,10 @@ namespace Day_18
 
             public override int GetHashCode()
             {
-                return HashCode.Combine(X, Y);
+                return new { X, Y }.GetHashCode();
             }
 
-            public IEnumerable<Coords> Around()
+            public IEnumerable<Coords> Steps()
             {
                 yield return new Coords { X = X, Y = Y - 1 };
                 yield return new Coords { X = X - 1, Y = Y };
