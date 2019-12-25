@@ -1,0 +1,22 @@
+﻿south
+east
+take space heater
+west
+north
+west
+north
+east
+south
+take asterisk
+south
+take klein bottle
+north
+north
+west
+north
+take astronaut ice cream
+south
+south
+south
+west
+south
